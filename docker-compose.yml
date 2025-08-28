@@ -1,0 +1,15 @@
+﻿services:
+  db:
+    image: mysql
+    restart: always
+    environment:
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=senhafoda
+      - MYSQL_DATABASE=minimal
+      - MYSQL_ROOT_PASSWORD=minimalpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-volume:/var/lib/mysql
+volumes:
+  db-volume:
