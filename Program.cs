@@ -1,18 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using Minimal01.Domain.DTO;
-using Minimal01.Domain.Entities;
-using Minimal01.Infra.Data;
+using Minimal01.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddDbContext<ApiDbContext>(o =>
-{
-    o.UseMySql(builder.Configuration.GetConnectionString("db"),
-    ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("db")));
-});
+builder.Services.AddServices(builder.Configuration);
 
 var app = builder.Build();
 
@@ -24,15 +14,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-
-
-app.MapGet("/admins", (ApiDbContext db) =>
-{
-    var admins = db.Admins.ToList();
-    return Results.Ok(admins);
-});
-
-
+app.AddEndpoints();
 app.Run();
 
