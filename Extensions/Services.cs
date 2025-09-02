@@ -18,5 +18,6 @@ public static class Services
         });
 
         services.AddScoped<IAdminService, AdminService>();
+        services.AddScoped<IVehicleService, VehicleService>();
     }
 }
