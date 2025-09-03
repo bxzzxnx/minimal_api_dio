@@ -13,23 +13,4 @@ public class ApiDbContext : DbContext
     {
 
     }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-
-        modelBuilder
-            .Entity<Admin>()
-            .HasData(
-                new Admin()
-                {
-                    Id = 1,
-                    Email = "admin@admin.com",
-                    Password = "senhaforte",
-                    Profile = "Adm"
-                }
-        );
-    }
-
-
 }
