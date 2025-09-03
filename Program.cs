@@ -15,5 +15,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.AddEndpoints();
+app.UseAuthentication();
+app.UseAuthorization();
 app.Run();
 

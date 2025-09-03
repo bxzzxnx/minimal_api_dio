@@ -9,20 +9,24 @@ namespace Minimal01.Application.Services;
 public class AdminService : IAdminService
 {
     private readonly ApiDbContext _context;
+    private readonly ITokenGenerator _tokenGenerator;
 
-    public AdminService(ApiDbContext context)
+    public AdminService(ApiDbContext context, ITokenGenerator tokenGenerator)
     {
         _context = context;
+        _tokenGenerator = tokenGenerator;
     }
 
-    public async Task<Admin?> Login(LoginDto request)
+    public async Task<LoggedAdmDto?> Login(LoginDto request)
     {
         var admin = await _context.Admins
             .Where(a => a.Email == request.Email)
             .FirstOrDefaultAsync();
         if (admin is not null && BCrypt.Net.BCrypt.Verify(request.Password, admin.Password))
         {
-            return admin;
+            var token = _tokenGenerator.Generate(admin);
+            var response = new LoggedAdmDto(admin.Email, admin.Profile, token);
+            return response;
         }
         return null;
     }

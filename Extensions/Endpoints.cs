@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Minimal01.Application;
 using Minimal01.Application.Validators;
 using Minimal01.Domain.DTO;
 using Minimal01.Domain.Interfaces;
@@ -11,21 +10,30 @@ public static class Endpoints
     public static void AddEndpoints(this WebApplication app)
     {
         var api = app.MapGroup("/api");
-        var vehicleRoutes = api.MapGroup("/vehicle").WithTags("Vehicles");
+        var vehicleRoutes = api.MapGroup("/vehicle").WithTags("Vehicles").RequireAuthorization();
         var adminRoutes = api.MapGroup("/admin").WithTags("Admin");
         
-        api.MapGet("/home", () => new { documentacao = "/swagger" }).WithTags("Home");
+        api.MapGet("/", () => new { documentacao = "/swagger" }).WithTags("Home");
+        
         
         adminRoutes.MapGet("/admins", async (IAdminService service) =>
         {
             var response = await service.ShowAll();
             return Results.Ok(response);
-        });
+        }).RequireAuthorization();
         
         adminRoutes.MapGet("/{id:int}", async (int id, IAdminService service) =>
         {
             var response = await service.GetById(id);
             return response == null ? Results.NotFound() : Results.Ok(response);
+        }).RequireAuthorization();
+        
+        adminRoutes.MapPost("/register", async ([FromBody] AdminDto request, IAdminService service) =>
+        {
+            var errors = AdminValidator.Validate(request);
+            if (errors.Count > 0) return Results.BadRequest(errors);
+            var response = await service.Register(request);
+            return Results.Created(string.Empty, response);
         });
         
         adminRoutes.MapPost("/login", async ([FromBody] LoginDto request, IAdminService service) =>
@@ -33,14 +41,6 @@ public static class Endpoints
             var response = await service.Login(request);
             if (response != null) return Results.Ok(response);
             return Results.Unauthorized();
-        });
-
-        adminRoutes.MapPost("/register", async ([FromBody] AdminDto request, IAdminService service) =>
-        {
-            var errors = AdminValidator.Validate(request);
-            if (errors.Count > 0) return Results.BadRequest(errors);
-            var response = await service.Register(request);
-            return Results.Created(string.Empty, response);
         });
         
         vehicleRoutes.MapGet("/", async (int? page, string? model, string? brand, IVehicleService service) =>
