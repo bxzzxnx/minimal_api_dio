@@ -5,5 +5,8 @@ namespace Minimal01.Domain.Interfaces;
 
 public interface IAdminService
 {
-    Task<Admin?> Login(LoginDTO request);
+    Task<Admin?> Login(LoginDto request);
+    Task<Admin> Register(AdminDto request);
+    Task<List<AdminResponseDto>> ShowAll();
+    Task<Admin?> GetById(int id);
 }

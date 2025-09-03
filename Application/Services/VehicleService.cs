@@ -15,7 +15,7 @@ public class VehicleService : IVehicleService
         _context = context;
     }
 
-    public async Task<Vehicle> Register(VehicleDTO request)
+    public async Task<Vehicle> Register(VehicleDto request)
     {
         var vehicle = new Vehicle
         {

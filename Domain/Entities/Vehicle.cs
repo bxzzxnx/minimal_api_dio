@@ -6,7 +6,7 @@ namespace Minimal01.Domain.Entities;
 public class Vehicle
 {
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public int Id { get; set; }
+    public int Id { get; init; }
     [Required, StringLength(150)]
     public string Model { get; set; } = string.Empty;
     [Required, StringLength(100)]

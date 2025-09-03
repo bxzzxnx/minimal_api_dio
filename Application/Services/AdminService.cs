@@ -15,11 +15,43 @@ public class AdminService : IAdminService
         _context = context;
     }
 
-    public async Task<Admin?> Login(LoginDTO request)
+    public async Task<Admin?> Login(LoginDto request)
     {
-        var queue = await _context.Admins
-            .Where(a => a.Email == request.Email && a.Password == request.Password)
+        var admin = await _context.Admins
+            .Where(a => a.Email == request.Email)
             .FirstOrDefaultAsync();
+        if (admin is not null && BCrypt.Net.BCrypt.Verify(request.Password, admin.Password))
+        {
+            return admin;
+        }
+        return null;
+    }
+
+    public async Task<Admin> Register(AdminDto request)
+    {
+        
+        var admin = new Admin
+        {
+            Email = request.Email,
+            Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            Profile = request.Profile.ToString()!
+        };
+        await _context.Admins.AddAsync(admin);
+        await _context.SaveChangesAsync();
+        return admin;
+    }
+
+    public async Task<List<AdminResponseDto>> ShowAll()
+    {
+        var queue = await _context.Admins.Select(a => new AdminResponseDto
+        {
+            Id = a.Id,
+            Email = a.Email,
+            Profile = a.Profile,
+        }).ToListAsync();
         return queue;
     }
+    public async Task<Admin?> GetById(int id) => 
+        await _context.Admins.Where(a => a.Id == id).FirstOrDefaultAsync();
+
 }

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using Minimal01.Application.Services;
 using Minimal01.Domain.Interfaces;

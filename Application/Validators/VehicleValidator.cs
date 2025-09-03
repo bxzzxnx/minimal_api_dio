@@ -1,17 +1,17 @@
 using Minimal01.Domain;
 using Minimal01.Domain.DTO;
 
-namespace Minimal01.Application;
+namespace Minimal01.Application.Validators;
 
 public  static class VehicleValidator
 {
-    public static List<string> Validate(VehicleDTO dto)
+    public static List<string> Validate(VehicleDto dto)
     {
         var errors = new ErrorMessages();
 
         if (dto.Year < 1950)
         {
-            errors.Messages.Add($"Erro na propriedade Year, Valor não pode ser {dto.Year}, " +
+            errors.Messages.Add($"Erro na propriedade Year, Valor não pode ser nulo e , " +
                                 $"O ano deve ser maior ou igual a 1950");
         }
         if (string.IsNullOrEmpty(dto.Brand))
