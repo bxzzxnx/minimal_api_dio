@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Minimal01.Application.Validators;
 using Minimal01.Domain.DTO;
@@ -14,26 +15,37 @@ public static class Endpoints
         var adminRoutes = api.MapGroup("/admin").WithTags("Admin");
         
         api.MapGet("/", () => new { documentacao = "/swagger" }).WithTags("Home");
-        
-        
+
         adminRoutes.MapGet("/admins", async (IAdminService service) =>
         {
             var response = await service.ShowAll();
             return Results.Ok(response);
-        }).RequireAuthorization();
-        
+        })
+        .RequireAuthorization(new AuthorizeAttribute
+        {
+            Roles = "Admin"
+        });
+
         adminRoutes.MapGet("/{id:int}", async (int id, IAdminService service) =>
         {
             var response = await service.GetById(id);
             return response == null ? Results.NotFound() : Results.Ok(response);
-        }).RequireAuthorization();
-        
+        })
+        .RequireAuthorization(new AuthorizeAttribute
+        {
+            Roles = "Admin"
+        });
+
         adminRoutes.MapPost("/register", async ([FromBody] AdminDto request, IAdminService service) =>
         {
             var errors = AdminValidator.Validate(request);
             if (errors.Count > 0) return Results.BadRequest(errors);
             var response = await service.Register(request);
             return Results.Created(string.Empty, response);
+        })
+        .RequireAuthorization(new AuthorizeAttribute
+        {
+            Roles = "Admin"
         });
         
         adminRoutes.MapPost("/login", async ([FromBody] LoginDto request, IAdminService service) =>
@@ -51,18 +63,23 @@ public static class Endpoints
 
         vehicleRoutes.MapPost("/register", async ([FromBody] VehicleDto request, IVehicleService service) =>
         {
-            var errors  = VehicleValidator.Validate(request);
+            var errors = VehicleValidator.Validate(request);
             if (errors.Count > 0) return Results.BadRequest(errors);
             var vehicle = await service.Register(request);
             return Results.Created(string.Empty, vehicle);
+        }).RequireAuthorization(new AuthorizeAttribute
+        {
+            Roles = "Admin,Editor"
         });
 
         vehicleRoutes.MapGet("/{id:int}", async (int id, IVehicleService service) =>
         {
             var response = await service.GetCarById(id);
             return response == null ? Results.NotFound() : Results.Ok(response);
+        }).RequireAuthorization(new AuthorizeAttribute
+        {
+            Roles = "Admin,Editor"
         });
-
 
         vehicleRoutes.MapPut("/{id:int}", async (int id , VehicleDto request, IVehicleService service) =>
         {
@@ -79,6 +96,9 @@ public static class Endpoints
             await service.Update(vehicle);
 
             return Results.Ok(vehicle);
+        }).RequireAuthorization(new AuthorizeAttribute
+        {
+            Roles = "Admin"
         });
         
         vehicleRoutes.MapDelete("/{id:int}", async (int id, IVehicleService service) =>
@@ -88,6 +108,9 @@ public static class Endpoints
 
             await service.Remove(vehicle);
             return Results.NoContent();
+        }).RequireAuthorization(new AuthorizeAttribute
+        {
+            Roles = "Admin"
         });
     }
 }

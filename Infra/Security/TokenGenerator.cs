@@ -23,7 +23,8 @@ public class TokenGenerator : ITokenGenerator
         var claim = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Email, admin.Email),
-            new("Profile", admin.Profile)
+            new("Profile", admin.Profile),
+            new(ClaimTypes.Role, admin.Profile)
         };
     
         var handler = new JwtSecurityTokenHandler();
