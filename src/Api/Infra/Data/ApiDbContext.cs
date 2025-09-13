@@ -25,6 +25,13 @@ public class ApiDbContext : DbContext
                 Email = "admin@admin.com",
                 Password = "$2a$11$LlNMMUOk9kQ7yrGlOLawherD/qmS.g/4hwAvUUT.7fYx7x979aqWi", // admin
                 Profile = "Admin"
+            },
+            new Admin
+            {
+                Id = 2,
+                Email = "ed@ed.com",
+                Password = "$2a$11$qLJPltGTeuLgTaoJfGyPm.DKKfngytXM0v52YfhgxgEwXB0okpYvW" , // editor
+                Profile = "Editor"
             }
         );
     }

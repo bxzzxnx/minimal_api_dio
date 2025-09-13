@@ -30,7 +30,7 @@ public class VehicleService : IVehicleService
     }
 
 
-    public async Task<List<Vehicle>> GetAll(int? page, string? model = null, string? brand = null)
+    public async Task<List<Vehicle>> GetAll(int? page = null, string? model = null, string? brand = null)
     {
         var query = _context.Cars.AsQueryable();
         int itemsPerPage = 10;
