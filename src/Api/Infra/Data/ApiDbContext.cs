@@ -34,6 +34,15 @@ public class ApiDbContext : DbContext
                 Profile = "Editor"
             }
         );
+
+        modelBuilder.Entity<Vehicle>()
+            .HasData(new Vehicle
+            {
+                Id = 1,
+                Brand = "Test Brand",
+                Model= "Test Model",
+                Year = 2018,
+            });
     }
     
     
