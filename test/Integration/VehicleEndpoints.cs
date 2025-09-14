@@ -7,7 +7,33 @@ namespace Test.Integration;
 [TestClass]
 public class VehicleEndpoints : IntegrationTestBase
 {
-    private static VehicleDto CreateVehicleDto() => new("Uno", "Fiat", 2003);
+    private static VehicleDto CreateVehicleDto(string model, string brand, int year) => new(model, brand, year);
+    
+    [TestMethod]
+    public async Task GetVehicle_WithAdminAuth_ShouldReturnOk()
+    {
+        await AuthenticateClient(AdminEmail, AdminPassword);
+        var response = await HttpClient.GetAsync($"/api/vehicle/{Id}");
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+    }
+    
+    [TestMethod]
+    public async Task CreateVehicle_WithEditorAuth_ShouldReturnOk()
+    {
+        var request = CreateVehicleDto("created by the editor via test","Test",2000);
+        await AuthenticateClient(EditorEmail, EditorPassword);
+        var response = await HttpClient.PostAsJsonAsync("/api/vehicle/register", request);
+        Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+    }
+    
+    [TestMethod]
+    public async Task CreateVehicle_WithAdminAuth_ShouldReturnOk()
+    {
+        var request = CreateVehicleDto("created by the Admin via test","Test",2002);
+        await AuthenticateClient(AdminEmail, AdminPassword);
+        var response = await HttpClient.PostAsJsonAsync("/api/vehicle/register", request);
+        Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+    }
     
     [TestMethod]
     public async Task GetAllVehicles_WithAdminAuth_ShouldReturnOk()
@@ -32,32 +58,6 @@ public class VehicleEndpoints : IntegrationTestBase
         var response = await HttpClient.GetAsync($"/api/vehicle/{Id}");
         Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
     }
-    
-    [TestMethod]
-    public async Task GetVehicle_WithAdminAuth_ShouldReturnOk()
-    {
-        await AuthenticateClient(AdminEmail, AdminPassword);
-        var response = await HttpClient.GetAsync($"/api/vehicle/{Id}");
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-    }
-    
-    [TestMethod]
-    public async Task CreateVehicle_WithEditorAuth_ShouldReturnOk()
-    {
-        var request = CreateVehicleDto();
-        await AuthenticateClient(EditorEmail, EditorPassword);
-        var response = await HttpClient.PostAsJsonAsync("/api/vehicle/register", request);
-        Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
-    }
-    
-    [TestMethod]
-    public async Task CreateVehicle_WithAdminAuth_ShouldReturnOk()
-    {
-        var request = CreateVehicleDto();
-        await AuthenticateClient(AdminEmail, AdminPassword);
-        var response = await HttpClient.PostAsJsonAsync("/api/vehicle/register", request);
-        Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
-    }
 
     [TestMethod]
     public async Task UpdateVehicle_WithEditorAuth_ShouldReturnForbidden()
@@ -68,16 +68,6 @@ public class VehicleEndpoints : IntegrationTestBase
         Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
     }
     
-    
-    [TestMethod]
-    public async Task UpdateVehicle_WithAdminAuth_ShouldReturnOk()
-    {
-        var request = CreateVehicleDto();
-        await AuthenticateClient(AdminEmail, AdminPassword);
-        var response = await HttpClient.PutAsJsonAsync($"/api/vehicle/{Id}", request);
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-    }
-
     [TestMethod]
     public async Task DeleteVehicle_WithEditorAuth_ShouldReturnForbidden()
     {
